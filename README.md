@@ -1,6 +1,6 @@
 # MHR-BEST-2019-Programming
 
-## Welcome to the MHR Github Repo for BEST 2019 Programming!
+## Welcome to the MHR's Github Repo for BEST 2019 Programming!
 Below we will be going over how our programming works. 
 
 ## Software we are using:
