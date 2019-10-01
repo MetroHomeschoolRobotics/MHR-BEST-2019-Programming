@@ -1,6 +1,8 @@
 #pragma config(Sensor, in1,    irSensor1,      sensorLineFollower)
 #pragma config(Sensor, in2,    irSensor2,      sensorLineFollower)
 #pragma config(Sensor, in3,    irSensor3,      sensorLineFollower)
+#pragma config(Sensor, dgtl1,  ,               sensorDigitalIn)
+#pragma config(Sensor, dgtl2,  ,               sensorDigitalIn)
 #pragma config(Motor,  port2,           LeftMotor,     tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RightMotor,    tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           ArmMotor,      tmotorVex393_MC29, openLoop)
@@ -25,6 +27,8 @@ const bool on = true;
 //very pronounced and can lead to "jerky" driving
 int thresh = 2;
 
+int white = 100;
+
 //we are making a task drive to keep code organized
 //think of this as a container that we place all code that has
 //to do with driving in and we label it and place it on a shelf to be used later
@@ -37,6 +41,20 @@ task drive()
 		motor[LeftMotor] = -leftX - leftY;
 		motor[RightMotor] = -leftX + leftY;
 		//If button 8D is pressed it will activate the line follow funtion.
+
+		while(vexRT[Btn8U])
+		{
+			if(SensorValue[irSensor1] > white)//when the IR sensor detects a value less than 245(white) it will run the left motor.
+			{
+				motor[LeftMotor] = -50;
+			}
+			if(SensorValue[irSensor2] > white)//when the IR sensor detects a value less than 245(white) it will run the right motor.
+			{
+				motor[RightMotor] = 50;
+			}
+
+		}
+
 	}
 }
 
@@ -68,17 +86,7 @@ task manipulator()
 //This is the code for the line following program.
 task autonomous()
 {
-	while(vexRT[Btn8D])
-	{
-		if(SensorValue[irSensor1] < 245)//when the IR sensor detects a value less than 245(white) it will run the left motor.
-		{
-			motor[LeftMotor] = -127;
-		}
-		if(SensorValue[irSensor2] < 245)//when the IR sensor detects a value less than 245(white) it will run the right motor.
-		{
-			motor[RightMotor] = 127;
-		}
-	}
+
 }
 
 //task main is, to keep following out analogy the place where we give
@@ -92,7 +100,7 @@ task main()
 	startTask(drive);
 	startTask(manipulator);
 	startTask(autonomous);
-	
+
 	while(on) //"while true"
 	{
 		//here is where we actually apply the threshold
