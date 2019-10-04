@@ -42,19 +42,17 @@ task drive()
 		motor[RightMotor] = -leftX + leftY;
 		//If button 8D is pressed it will activate the line follow funtion.
 
-		while(vexRT[Btn8U])
+		if(vexRT[Btn8U])
 		{
-			if(SensorValue[irSensor1] > white)//when the IR sensor detects a value less than 245(white) it will run the left motor.
+			while(SensorValue[irSensor1] < white)
 			{
-				motor[LeftMotor] = -50;
+				motor[LeftMotor] = -127;
 			}
-			if(SensorValue[irSensor2] > white)//when the IR sensor detects a value less than 245(white) it will run the right motor.
+			while(SensorValue[irSensor2] < white)
 			{
-				motor[RightMotor] = 50;
+				motor[RightMotor] = 127;
 			}
-
 		}
-
 	}
 }
 
