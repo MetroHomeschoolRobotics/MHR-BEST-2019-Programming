@@ -42,16 +42,27 @@ task drive()
 		motor[RightMotor] = -leftX + leftY;
 		//If button 8D is pressed it will activate the line follow funtion.
 
-		if(vexRT[Btn8U])
+		if(vexRT[Btn8U])//IR sensor code.(WORK IN PROGRESS)
 		{
-			while(SensorValue[irSensor1] < white)
-			{
-				motor[LeftMotor] = -127;
-			}
-			while(SensorValue[irSensor2] < white)
+			while(SensorValue[irSensor1] <= white)
 			{
 				motor[RightMotor] = 127;
-			}
+			} 
+			while(SensorValue[irSensor2] <= white)
+			{
+				motor[LeftMotor] = -127;
+			} 
+		}
+		if(vexRT[Btn8D])//Dance funtion. REMOVE BEFORE COMPETITION!
+		{
+			motor[LeftMotor] = -127;
+			wait1Msec(5000);
+			motor[RightMotor] = 127;
+			motor[LeftMotor] = -127;
+			wait1Msec(1000);
+			motor[RightMotor] = 127;
+			motor[LeftMotor] = 127;
+			wait1Msec(2500);
 		}
 	}
 }
@@ -68,11 +79,11 @@ task manipulator()
 
 		if(vexRT[Btn6U])
 		{
-			motor[Extender] = 127;
+			motor[Extender] = 100;
 		}
 		else if(vexRT[Btn6D])
 		{
-			motor[Extender] = -127;
+			motor[Extender] = -100;
 		}
 		else
 		{
