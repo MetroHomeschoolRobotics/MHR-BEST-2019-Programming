@@ -1,5 +1,5 @@
-#pragma config(Sensor, in1,    irSensor1,      sensorLineFollower)
-#pragma config(Sensor, in2,    irSensor2,      sensorLineFollower)
+#pragma config(Sensor, in1,    irSensorR,      sensorLineFollower)
+#pragma config(Sensor, in2,    irSensorL,      sensorLineFollower)
 #pragma config(Sensor, in3,    irSensor3,      sensorLineFollower)
 #pragma config(Sensor, dgtl1,  ,               sensorDigitalIn)
 #pragma config(Sensor, dgtl2,  ,               sensorDigitalIn)
@@ -27,7 +27,7 @@ const bool on = true;
 //very pronounced and can lead to "jerky" driving
 int thresh = 2;
 
-int white = 100;
+int black = 1007;
 
 //we are making a task drive to keep code organized
 //think of this as a container that we place all code that has
@@ -42,16 +42,25 @@ task drive()
 		motor[RightMotor] = -leftX + leftY;
 		//If button 8D is pressed it will activate the line follow funtion.
 
-		if(vexRT[Btn8U])//IR sensor code.(WORK IN PROGRESS)
+		while(vexRT[Btn8U])//IR sensor code.(WORK IN PROGRESS)
 		{
-			while(SensorValue[irSensor1] <= white)
-			{
-				motor[RightMotor] = 127;
-			} 
-			while(SensorValue[irSensor2] <= white)
+			if(SensorValue[irSensorR] <= 100)
 			{
 				motor[LeftMotor] = -127;
-			} 
+			}
+			if(SensorValue[irSensorL] <= 100)
+			{
+				motor[RightMotor] = 127;
+			}
+			if(SensorValue[irSensorR] >= 101)
+			{
+				motor[LeftMotor] = 0;
+			}
+			if(SensorValue[irSensorL] >= 101)
+			{
+				motor[RightMotor] = 0;
+			}
+			
 		}
 		if(vexRT[Btn8D])//Dance funtion. REMOVE BEFORE COMPETITION!
 		{
