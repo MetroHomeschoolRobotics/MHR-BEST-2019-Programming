@@ -62,17 +62,6 @@ task drive()
 			}
 			
 		}
-		if(vexRT[Btn8D])//Dance funtion. REMOVE BEFORE COMPETITION!
-		{
-			motor[LeftMotor] = -127;
-			wait1Msec(5000);
-			motor[RightMotor] = 127;
-			motor[LeftMotor] = -127;
-			wait1Msec(1000);
-			motor[RightMotor] = 127;
-			motor[LeftMotor] = 127;
-			wait1Msec(2500);
-		}
 	}
 }
 
