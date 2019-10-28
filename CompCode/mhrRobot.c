@@ -1,8 +1,5 @@
 #pragma config(Sensor, in1,    irSensorR,      sensorLineFollower)
 #pragma config(Sensor, in2,    irSensorL,      sensorLineFollower)
-#pragma config(Sensor, in3,    irSensor3,      sensorLineFollower)
-#pragma config(Sensor, dgtl1,  ,               sensorDigitalIn)
-#pragma config(Sensor, dgtl2,  ,               sensorDigitalIn)
 #pragma config(Motor,  port2,           LeftMotor,     tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RightMotor,    tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           ArmMotor,      tmotorVex393_MC29, openLoop)
@@ -28,7 +25,9 @@ const bool on = true;
 //very pronounced and can lead to "jerky" driving
 int thresh = 2;
 int armThresh = 5;
-int irReturns = 505;
+
+//value recieved from the ir sensor
+int irReturns = 305;
 
 //we are making a task drive to keep code organized
 //think of this as a container that we place all code that has
@@ -41,20 +40,34 @@ task drive()
 		//arcade is mostly prefered leaving the second joystick open for arm movement
 		motor[LeftMotor] = -leftX - leftY;
 		motor[RightMotor] = -leftX + leftY;
-		
+
 		//If button 8D is pressed it will activate the line follow funtion.
 		while(vexRT[Btn8U])//IR sensor code.(WORK IN PROGRESS)
 		{
-			if(SensorValue[irSensorR] < irReturns)
-			{
-				motor[LeftMotor] = -65;
-				motor[RightMotor] = 0;
-			}
+			//left sensor sees white
 			if(SensorValue[irSensorL] < irReturns)
 			{
-				motor[RightMotor] = 65;
+				//turn left to avoid white
 				motor[LeftMotor] = 0;
-			}	
+				motor[RightMotor] = 70;
+
+			}
+
+			//right sensor sees white
+			if(SensorValue[irSensorR] < irReturns)
+			{
+				//turn right to avoid white
+				motor[LeftMotor] = -70;
+				motor[RightMotor] = 0;
+			}
+
+			//left and right sensor sees black
+			if(SensorValue[irSensorL && irSensorR] > irReturns)
+			{
+				//drive forward
+				motor[LeftMotor] = -65;
+				motor[RightMotor] = 65;
+			}
 		}
 	}
 }
