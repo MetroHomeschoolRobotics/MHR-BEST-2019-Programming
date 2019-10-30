@@ -1,5 +1,7 @@
 #pragma config(Sensor, in1,    irSensorR,      sensorLineFollower)
-#pragma config(Sensor, in2,    irSensorL,      sensorLineFollower)
+#pragma config(Sensor, in2,    irSensorC,      sensorLineFollower)
+#pragma config(Sensor, in3,    irSensorL,      sensorLineFollower)
+#pragma config(Sensor, dgtl1,  limitSwitch,    sensorDigitalIn)
 #pragma config(Motor,  port2,           LeftMotor,     tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RightMotor,    tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           ArmMotor,      tmotorVex393_MC29, openLoop)
@@ -24,10 +26,7 @@ const bool on = true;
 //a lower value gives more control at low speeds but small movements are
 //very pronounced and can lead to "jerky" driving
 int thresh = 2;
-int armThresh = 5;
-
-//value recieved from the ir sensor
-int irReturns = 305;
+int irBtn = 0;
 
 //we are making a task drive to keep code organized
 //think of this as a container that we place all code that has
@@ -41,31 +40,21 @@ task drive()
 		motor[LeftMotor] = -leftX - leftY;
 		motor[RightMotor] = -leftX + leftY;
 
-		//If button 8D is pressed it will activate the line follow funtion.
-		while(vexRT[Btn8U])//IR sensor code.(WORK IN PROGRESS)
+		while(vexRT[Btn8D])
 		{
-			//left sensor sees white
-			if(SensorValue[irSensorL] < irReturns)
+			if(SensorValue[irSensorR] < 505)
 			{
-				//turn left to avoid white
-				motor[LeftMotor] = 0;
-				motor[RightMotor] = 70;
-
-			}
-
-			//right sensor sees white
-			if(SensorValue[irSensorR] < irReturns)
-			{
-				//turn right to avoid white
-				motor[LeftMotor] = -70;
+				motor[LeftMotor] = -65;
 				motor[RightMotor] = 0;
 			}
-
-			//left and right sensor sees black
-			if(SensorValue[irSensorL && irSensorR] > irReturns)
+			if(SensorValue[irSensorC] < 505)
 			{
-				//drive forward
 				motor[LeftMotor] = -65;
+				motor[RightMotor] = 65;
+			}
+			if(SensorValue[irSensorL] < 505)
+			{
+				motor[LeftMotor] = 0;
 				motor[RightMotor] = 65;
 			}
 		}
@@ -80,28 +69,19 @@ task manipulator()
 	{
 		//below we are setting the ArmMotor to a value based on the
 		//position of the right joystick going up and down
-		motor[ArmMotor] = rightY / armThresh;
+		motor[ArmMotor] = rightY;
 
 		if(vexRT[Btn6U])
 		{
-			motor[Extender] = 100;
+			motor[Extender] = 127;
 		}
 		else if(vexRT[Btn6D])
 		{
-			motor[Extender] = -100;
+			motor[Extender] = -127;
 		}
 		else
 		{
 			motor[Extender] = 0;
-		}
-
-		if(vexRT[Btn5U])
-		{
-			motor[ManiServo] = -127;
-		}
-		else if(vexRT[Btn5D])
-		{
-			motor[ManiServo] = 127;
 		}
 	}
 }
@@ -129,7 +109,7 @@ task main()
 		//here is where we actually apply the threshold
 		//you may find that added a second threshold integer
 		//and using it for arm control
-		//this will give you more range for driving and opening up your low end control
+		//his will give you more range for driving and opening up your low end control
 		//while still leaving the manipulator slow and consistant... very good for precision grabbing
 		rightX = vexRT(Ch1);
 		if(abs(rightX)<thresh){
