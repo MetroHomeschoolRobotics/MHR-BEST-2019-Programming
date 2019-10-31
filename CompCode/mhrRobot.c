@@ -1,6 +1,5 @@
-#pragma config(Sensor, in1,    irSensorR,      sensorLineFollower)
-#pragma config(Sensor, in2,    irSensorC,      sensorLineFollower)
-#pragma config(Sensor, in3,    irSensorL,      sensorLineFollower)
+#pragma config(Sensor, in1,    irSensorL,      sensorLineFollower)
+#pragma config(Sensor, in2,    irSensorR,      sensorLineFollower)
 #pragma config(Sensor, dgtl1,  limitSwitch,    sensorDigitalIn)
 #pragma config(Motor,  port2,           LeftMotor,     tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RightMotor,    tmotorVex393_MC29, openLoop)
@@ -26,7 +25,8 @@ const bool on = true;
 //a lower value gives more control at low speeds but small movements are
 //very pronounced and can lead to "jerky" driving
 int thresh = 2;
-int irBtn = 0;
+int irReturns = 900;
+
 
 //we are making a task drive to keep code organized
 //think of this as a container that we place all code that has
@@ -40,22 +40,23 @@ task drive()
 		motor[LeftMotor] = -leftX - leftY;
 		motor[RightMotor] = -leftX + leftY;
 
+		//greater than irReturns sees dark colors
 		while(vexRT[Btn8D])
 		{
-			if(SensorValue[irSensorR] < 505)
+			if(SensorValue(irSensorL) < irReturns)
 			{
-				motor[LeftMotor] = -65;
+				motor[LeftMotor] = 60;
 				motor[RightMotor] = 0;
 			}
-			if(SensorValue[irSensorC] < 505)
-			{
-				motor[LeftMotor] = -65;
-				motor[RightMotor] = 65;
-			}
-			if(SensorValue[irSensorL] < 505)
+			if(SensorValue(irSensorR) < irReturns)
 			{
 				motor[LeftMotor] = 0;
-				motor[RightMotor] = 65;
+				motor[RightMotor] = -60;
+			}
+			else if(SensorValue(irSensorL && irSensorR) > irReturns)
+			{
+				motor[LeftMotor] = -60;
+				motor[RightMotor] = 60;
 			}
 		}
 	}
@@ -86,12 +87,6 @@ task manipulator()
 	}
 }
 
-//This is the code for the line following program.
-task autonomous()
-{
-
-}
-
 //task main is, to keep following out analogy the place where we give
 //instructions to actually go and grab the boxes that we labeled and use
 //their contents
@@ -102,7 +97,6 @@ task main()
 	//that is the desired action.
 	startTask(drive);
 	startTask(manipulator);
-	startTask(autonomous);
 
 	while(on) //"while true"
 	{
